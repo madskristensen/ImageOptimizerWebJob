@@ -6,9 +6,9 @@
         <title>Azure Image Optimizer</title>
         <authors>Mads Kristensen</authors>
         <owners>Mads Kristensen</owners>
-        <licenseUrl>https://github.com/madskristensen/ImageOptimizerWebJob/blob/master/LICENSE</licenseUrl>
+        <licenseUrl>https://raw.githubusercontent.com/madskristensen/ImageOptimizerWebJob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/madskristensen/ImageOptimizerWebJob</projectUrl>
-        <iconUrl>https://github.com/madskristensen/ImageOptimizerWebJob/master/art/logo64x64.png</iconUrl>
+        <iconUrl>https://raw.githubusercontent.com/madskristensen/ImageOptimizerWebJob/master/art/logo64x64.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>WebOptimizer.Analyzers</description>
         <copyright>Copyright Mads Kristensen</copyright>
