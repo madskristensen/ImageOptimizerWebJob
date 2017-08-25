@@ -23,7 +23,6 @@ namespace ImageOptimizerWebJob
             Console.WriteLine($"Logs to {logFilePath}");
 
             var queue = new ImageQueue(dir, logFilePath);
-            queue.Compressing += OnCompressing;
             queue.Compressed += OnCompressed;
 
             Task.Run(async () =>
@@ -33,12 +32,6 @@ namespace ImageOptimizerWebJob
 
             }).GetAwaiter().GetResult();
         }
-
-        private static void OnCompressing(object sender, string e)
-        {
-            Console.WriteLine($"Optimizing {Path.GetFileName(e)}...");
-        }
-
         private static void OnCompressed(object sender, CompressionResult e)
         {
             if (e.Saving > 0)

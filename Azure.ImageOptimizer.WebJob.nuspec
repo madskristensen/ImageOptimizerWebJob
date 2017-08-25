@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Azure.ImageOptimizer.WebJob</id>
-        <version>1.0.0.22</version>
+        <version>1.0.0.23</version>
         <title>Azure Image Optimizer</title>
         <authors>Mads Kristensen</authors>
         <owners>Mads Kristensen</owners>
@@ -10,7 +10,7 @@
         <projectUrl>https://github.com/madskristensen/ImageOptimizerWebJob</projectUrl>
         <iconUrl>https://raw.githubusercontent.com/madskristensen/ImageOptimizerWebJob/master/art/logo64x64.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>WebOptimizer.Analyzers</description>
+        <description>Optimizes images on Azure App Service</description>
         <copyright>Copyright Mads Kristensen</copyright>
         <tags>Image Optimizer, compression, optimization, png, jpg, gif</tags>
         <developmentDependency>true</developmentDependency>
