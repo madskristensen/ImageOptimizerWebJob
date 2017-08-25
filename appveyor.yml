@@ -6,7 +6,7 @@ build_script:
   - nuget pack
 
 artifacts:
-  - path: **\*.nupkg
+  - path: '**\*.nupkg'
     name: NuGet package
 
 deploy:
