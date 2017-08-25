@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26815.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageOptimizerWebJob", "src\ImageOptimizerWebJob.csproj", "{54932F6E-4CC1-464D-8F0C-2A8EBA333B6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD98C7ED-B573-4C01-8484-86061F26E1A0}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		Azure.ImageOptimizer.WebJob.nuspec = Azure.ImageOptimizer.WebJob.nuspec
+		Azure.ImageOptimizer.WebJob.targets = Azure.ImageOptimizer.WebJob.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54932F6E-4CC1-464D-8F0C-2A8EBA333B6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54932F6E-4CC1-464D-8F0C-2A8EBA333B6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54932F6E-4CC1-464D-8F0C-2A8EBA333B6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54932F6E-4CC1-464D-8F0C-2A8EBA333B6A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {425BA784-65F4-41A5-905A-1A1104A5E9CF}
+	EndGlobalSection
+EndGlobal
