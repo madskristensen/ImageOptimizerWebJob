@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Minimatch;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,21 +10,25 @@ namespace ImageOptimizerWebJob
     public class ImageQueue : List<string>
     {
         private static string[] _extensions = { ".jpg", ".jpeg", ".gif", ".png" };
-        private static string[] _ignorePatterns = { "\\node_modules\\", "\\bower_components\\", "\\typings\\" };
 
-        FileSystemWatcher _watcher;
-        FileHashStore _store;
+        private FileSystemWatcher _watcher;
+        private FileHashStore _store;
+        private Config _config;
+        private Minimatch.Options _matcherOptions = new Options { AllowWindowsPaths = true, IgnoreCase = true };
 
-        public ImageQueue(string folder, string logFilePath)
+        public ImageQueue(Config config)
         {
+            string dir = Path.GetDirectoryName(config.FilePath);
+
             foreach (string ext in _extensions)
             {
-                var images = Directory.EnumerateFiles(folder, "*" + ext, SearchOption.AllDirectories);
+                var images = Directory.EnumerateFiles(dir, "*" + ext, SearchOption.AllDirectories);
                 AddRange(images);
             }
 
-            _store = new FileHashStore(logFilePath);
-            StartListening(folder);
+            _store = new FileHashStore(config.LogFilePath);
+            _config = config;
+            StartListening(dir);
         }
 
         public event EventHandler<CompressionResult> Compressed;
@@ -38,7 +43,7 @@ namespace ImageOptimizerWebJob
             _watcher.EnableRaisingEvents = true;
         }
 
-        public async Task ProcessQueueAsync(bool lossy)
+        public async Task ProcessQueueAsync()
         {
             Compressor c = new Compressor();
 
@@ -48,18 +53,18 @@ namespace ImageOptimizerWebJob
             while (true)
             {
                 var max = Count;
+
                 Parallel.For(0, max, options, i =>
                 {
                     var file = this[i];
 
-                    if (_store.HasChangedOrIsNew(file))
+                    if (IsImageOnProbingPath(file) && _store.HasChangedOrIsNew(file))
                     {
                         Compressing?.Invoke(this, file);
-                        var result = c.CompressFile(file, lossy);
+                        var result = c.CompressFile(file, _config.Lossy);
                         Compressed?.Invoke(this, result);
                         _store.Save(file);
                     }
-
                 });
 
                 if (max > 0)
@@ -71,21 +76,31 @@ namespace ImageOptimizerWebJob
             }
         }
 
+        private bool IsImageOnProbingPath(string file)
+        {
+            bool isIncluded = _config.Includes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
+
+            if (!isIncluded)
+                return false;
+
+            bool isExcluded = _config.Excludes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
+
+            if (isExcluded)
+                return false;
+
+            return true;
+        }
+
         private void FileChanged(object sender, FileSystemEventArgs e)
         {
             string file = e.FullPath.ToLowerInvariant();
             string ext = Path.GetExtension(file);
 
-            if (!string.IsNullOrEmpty(ext) &&
-                !_ignorePatterns.Any(p => file.Contains(p)) &&
-                _extensions.Contains(ext, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(ext) && _extensions.Contains(ext, StringComparer.OrdinalIgnoreCase))
             {
-                if (_store.HasChangedOrIsNew(file))
+                if (_store.HasChangedOrIsNew(file) && !Contains(file))
                 {
-                    if (!Contains(file))
-                    {
-                        Add(file);
-                    }
+                    Add(file);
                 }
             }
         }

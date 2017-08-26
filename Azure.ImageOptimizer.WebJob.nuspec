@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Azure.ImageOptimizer.WebJob</id>
-        <version>1.0.0.23</version>
+        <version>1.0.0.29</version>
         <title>Azure Image Optimizer</title>
         <authors>Mads Kristensen</authors>
         <owners>Mads Kristensen</owners>
@@ -19,6 +19,7 @@
     <files>
         <!--<file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />-->
         <file src="src\bin\debug\*.exe" target="opti" />
+        <file src="src\bin\debug\*.dll" target="opti" />
         <file src="src\bin\debug\*.config" target="opti" />
         <file src="src\tools\*" target="opti\tools" />
         <file src="*.targets" target="build" />
