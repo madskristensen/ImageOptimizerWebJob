@@ -10,37 +10,21 @@ namespace ImageOptimizerWebJob
     public class ImageQueue : List<string>
     {
         private static string[] _extensions = { ".jpg", ".jpeg", ".gif", ".png" };
+        private static object _logRoot = new object();
 
         private FileSystemWatcher _watcher;
         private FileHashStore _store;
         private Config _config;
-        private Minimatch.Options _matcherOptions = new Options { AllowWindowsPaths = true, IgnoreCase = true };
+        private Options _matcherOptions = new Options { AllowWindowsPaths = true, IgnoreCase = true };
 
         public ImageQueue(Config config)
         {
-            string dir = Path.GetDirectoryName(config.FilePath);
-
-            foreach (string ext in _extensions)
-            {
-                var images = Directory.EnumerateFiles(dir, "*" + ext, SearchOption.AllDirectories);
-                AddRange(images);
-            }
-
-            _store = new FileHashStore(config.LogFilePath);
+            _store = new FileHashStore(config.CacheFilePath);
             _config = config;
+
+            string dir = Path.GetDirectoryName(config.FilePath);
+            QueueExistingFiles();
             StartListening(dir);
-        }
-
-        public event EventHandler<CompressionResult> Compressed;
-        public event EventHandler<string> Compressing;
-
-        private void StartListening(string folder)
-        {
-            _watcher = new FileSystemWatcher(folder);
-            _watcher.Changed += FileChanged;
-            _watcher.IncludeSubdirectories = true;
-            _watcher.NotifyFilter = NotifyFilters.Size | NotifyFilters.CreationTime;
-            _watcher.EnableRaisingEvents = true;
         }
 
         public async Task ProcessQueueAsync()
@@ -58,12 +42,13 @@ namespace ImageOptimizerWebJob
                 {
                     var file = this[i];
 
-                    if (IsImageOnProbingPath(file) && _store.HasChangedOrIsNew(file))
+                    if (IsImageOnProbingPath(file) && _store.HasChangedOrIsNew(file, _config.Lossy))
                     {
-                        Compressing?.Invoke(this, file);
                         var result = c.CompressFile(file, _config.Lossy);
-                        Compressed?.Invoke(this, result);
-                        _store.Save(file);
+
+                        HandleCompressionResult(result);
+
+                        _store.Save(file, _config.Lossy);
                     }
                 });
 
@@ -74,6 +59,46 @@ namespace ImageOptimizerWebJob
 
                 await Task.Delay(1000);
             }
+        }
+
+        private void HandleCompressionResult(CompressionResult result)
+        {
+            if (result.Saving > 0)
+            {
+                File.Copy(result.ResultFileName, result.OriginalFileName, true);
+                File.Delete(result.ResultFileName);
+            }
+
+            string dir = Path.GetDirectoryName(_config.FilePath);
+
+            lock (_logRoot)
+            {
+                using (var writer = new StreamWriter(_config.LogFilePath, true))
+                {
+                    string fileName = result.OriginalFileName.Replace(dir, string.Empty);
+                    writer.WriteLine($"{DateTime.UtcNow.ToString("s")};{fileName};{result.Percent}%;{(_config.Lossy ? "lossy" : "lossless")}");
+                }
+            }
+        }
+
+        private void QueueExistingFiles()
+        {
+            string dir = Path.GetDirectoryName(_config.FilePath);
+
+            foreach (string ext in _extensions)
+            {
+                var images = Directory.EnumerateFiles(dir, "*" + ext, SearchOption.AllDirectories);
+                AddRange(images);
+            }
+        }
+
+        private void StartListening(string folder)
+        {
+            _watcher = new FileSystemWatcher(folder);
+            _watcher.Changed += FileChanged;
+            _watcher.IncludeSubdirectories = true;
+            _watcher.NotifyFilter = NotifyFilters.Size | NotifyFilters.CreationTime;
+            _watcher.EnableRaisingEvents = true;
         }
 
         private bool IsImageOnProbingPath(string file)
@@ -93,15 +118,20 @@ namespace ImageOptimizerWebJob
 
         private void FileChanged(object sender, FileSystemEventArgs e)
         {
-            string file = e.FullPath.ToLowerInvariant();
+            string file = e.FullPath;
             string ext = Path.GetExtension(file);
 
-            if (!string.IsNullOrEmpty(ext) && _extensions.Contains(ext, StringComparer.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(ext) || ext.Contains('~'))
+                return;
+
+            if (_extensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && !Contains(file) && _store.HasChangedOrIsNew(file, _config.Lossy))
             {
-                if (_store.HasChangedOrIsNew(file) && !Contains(file))
-                {
-                    Add(file);
-                }
+                Add(file);
+            }
+            else if (e.FullPath == _config.FilePath)
+            {
+                _config.Update();
+                QueueExistingFiles();
             }
         }
     }

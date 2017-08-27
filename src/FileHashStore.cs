@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace ImageOptimizerWebJob
@@ -46,7 +44,7 @@ namespace ImageOptimizerWebJob
             }
         }
 
-        public void Save(string file)
+        public void Save(string file, bool lossy)
         {
             bool exist = _store.ContainsKey(file);
 
@@ -54,7 +52,7 @@ namespace ImageOptimizerWebJob
             {
                 lock (_syncRoot)
                 {
-                    _store[file] = GetHash(file);
+                    _store[file] = GetHash(file, lossy);
 
                     if (!exist)
                     {
@@ -78,12 +76,12 @@ namespace ImageOptimizerWebJob
             catch { }
         }
 
-        public bool HasChangedOrIsNew(string file)
+        public bool HasChangedOrIsNew(string file, bool lossy)
         {
             if (!_store.ContainsKey(file))
                 return true;
 
-            string currentHash = GetHash(file);
+            string currentHash = GetHash(file, lossy);
 
             if (string.IsNullOrEmpty(currentHash))
                 return true;
@@ -91,19 +89,21 @@ namespace ImageOptimizerWebJob
             return currentHash != _store[file];
         }
 
-        private string GetHash(string file)
+        private string GetHash(string file, bool lossy)
         {
             try
             {
                 if (!File.Exists(file))
                     return null;
 
-                using (var md5 = MD5.Create())
-                using (var stream = File.OpenRead(file))
-                {
-                    byte[] hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash);
-                }
+                return new FileInfo(file).Length + (lossy ? " - " + nameof(lossy) : "");
+
+                //using (var md5 = MD5.Create())
+                //using (var stream = File.OpenRead(file))
+                //{
+                //    byte[] hash = md5.ComputeHash(stream);
+                //    return BitConverter.ToString(hash);
+                //}
             }
             catch
             {

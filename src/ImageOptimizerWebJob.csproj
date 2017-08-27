@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="CompressionResult.cs" />
     <Compile Include="Compressor.cs" />
+    <Compile Include="Defaults.cs" />
     <Compile Include="FileHashStore.cs" />
     <Compile Include="ImageQueue.cs" />
     <Compile Include="Config.cs" />
