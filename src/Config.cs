@@ -12,6 +12,7 @@ namespace ImageOptimizerWebJob
         {
             Includes = Defaults.Includes;
             Excludes = Defaults.Excludes;
+            WarmupTime = Defaults.WarmupTime;
             CacheFilePath = Defaults.CacheFilePath;
             FilePath = Path.Combine(Defaults.FolderToWatch, Defaults.ConfigFileName);
         }
@@ -19,6 +20,7 @@ namespace ImageOptimizerWebJob
         public IEnumerable<string> Includes { get; set; }
         public IEnumerable<string> Excludes { get; set; }
         public bool Lossy { get; set; }
+        public int WarmupTime { get; set; }
 
         [ScriptIgnore]
         public string CacheFilePath { get; set; }
@@ -57,6 +59,7 @@ namespace ImageOptimizerWebJob
                     Includes = options.Includes;
                     Excludes = options.Excludes;
                     Lossy = options.Lossy;
+                    WarmupTime = options.WarmupTime;
                 }
             }
             else
@@ -67,6 +70,7 @@ namespace ImageOptimizerWebJob
                 Includes = options.Includes;
                 Excludes = options.Excludes;
                 Lossy = options.Lossy;
+                WarmupTime = options.WarmupTime;
             }
 
             NormalizePaths();

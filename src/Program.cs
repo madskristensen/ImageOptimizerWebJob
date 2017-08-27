@@ -18,13 +18,18 @@ namespace ImageOptimizerWebJob
                 logFilePath = "log.cache";
 
             var options = Config.FromPath(basePath, logFilePath);
-            Console.WriteLine($"Watching {new DirectoryInfo(basePath).FullName}");
-
             var queue = new ImageQueue(options);
 
             Task.Run(async () =>
             {
-                Console.WriteLine("Image Optimizer stared. Waiting for image file changes...");
+                int wait = options.WarmupTime * 1000;
+
+                Console.WriteLine($"Image Optimizer starting. Waiting for {options.WarmupTime} seconds...");
+                await Task.Delay(wait);
+
+                Console.WriteLine("Image Optimizer started");
+                Console.WriteLine($"Watching {new DirectoryInfo(basePath).FullName}");
+
                 await queue.ProcessQueueAsync();
 
             }).GetAwaiter().GetResult();

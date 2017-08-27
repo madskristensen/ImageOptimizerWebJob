@@ -13,51 +13,50 @@ namespace ImageOptimizerWebJob
         private static object _logRoot = new object();
 
         private FileSystemWatcher _watcher;
-        private FileHashStore _store;
+        private FileHashStore _cache;
         private Config _config;
         private Options _matcherOptions = new Options { AllowWindowsPaths = true, IgnoreCase = true };
 
         public ImageQueue(Config config)
         {
-            _store = new FileHashStore(config.CacheFilePath);
+            _cache = new FileHashStore(config.CacheFilePath);
             _config = config;
 
             string dir = Path.GetDirectoryName(config.FilePath);
-            QueueExistingFiles();
             StartListening(dir);
         }
 
         public async Task ProcessQueueAsync()
         {
-            Compressor c = new Compressor();
+            QueueExistingFiles();
 
-            int processors = Math.Max(Environment.ProcessorCount - 1, 1);
-            var options = new ParallelOptions { MaxDegreeOfParallelism = processors };
+            Compressor c = new Compressor();
 
             while (true)
             {
                 var max = Count;
 
-                Parallel.For(0, max, options, i =>
+                for (int i = 0; i < max; i++)
                 {
+                    await Task.Delay(250);
                     var file = this[i];
 
-                    if (IsImageOnProbingPath(file) && _store.HasChangedOrIsNew(file, _config.Lossy))
+                    if (IsImageOnProbingPath(file) && _cache.HasChangedOrIsNew(file, _config.Lossy))
                     {
                         var result = c.CompressFile(file, _config.Lossy);
 
                         HandleCompressionResult(result);
 
-                        _store.Save(file, _config.Lossy);
+                        _cache.Save(file, _config.Lossy);
                     }
-                });
+                }
 
                 if (max > 0)
                 {
                     RemoveRange(0, max);
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(5000);
             }
         }
 
@@ -124,7 +123,7 @@ namespace ImageOptimizerWebJob
             if (string.IsNullOrWhiteSpace(ext) || ext.Contains('~'))
                 return;
 
-            if (_extensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && !Contains(file) && _store.HasChangedOrIsNew(file, _config.Lossy))
+            if (_extensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && !Contains(file) && _cache.HasChangedOrIsNew(file, _config.Lossy))
             {
                 Add(file);
             }
