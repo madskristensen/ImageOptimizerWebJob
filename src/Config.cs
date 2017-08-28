@@ -10,16 +10,13 @@ namespace ImageOptimizerWebJob
     {
         public Config()
         {
-            Includes = Defaults.Includes;
-            Excludes = Defaults.Excludes;
+            Optimizations = new List<Optimization> { new Optimization() };
             WarmupTime = Defaults.WarmupTime;
             CacheFilePath = Defaults.CacheFilePath;
             FilePath = Path.Combine(Defaults.FolderToWatch, Defaults.ConfigFileName);
         }
 
-        public IEnumerable<string> Includes { get; set; }
-        public IEnumerable<string> Excludes { get; set; }
-        public bool Lossy { get; set; }
+        public List<Optimization> Optimizations { get; set; }
         public int WarmupTime { get; set; }
 
         [ScriptIgnore]
@@ -56,9 +53,7 @@ namespace ImageOptimizerWebJob
                 {
                     var ser = new JavaScriptSerializer();
                     var options = ser.Deserialize<Config>(reader.ReadToEnd());
-                    Includes = options.Includes;
-                    Excludes = options.Excludes;
-                    Lossy = options.Lossy;
+                    Optimizations = options.Optimizations;
                     WarmupTime = options.WarmupTime;
                 }
             }
@@ -67,9 +62,7 @@ namespace ImageOptimizerWebJob
                 Console.WriteLine($"No config file present. Using default configuration");
 
                 var options = new Config();
-                Includes = options.Includes;
-                Excludes = options.Excludes;
-                Lossy = options.Lossy;
+                Optimizations = options.Optimizations;
                 WarmupTime = options.WarmupTime;
             }
 
@@ -78,8 +71,12 @@ namespace ImageOptimizerWebJob
 
         private void NormalizePaths()
         {
-            Includes = Includes.Select(pattern => CleanGlobbingPattern(pattern));
-            Excludes = Excludes.Select(pattern => CleanGlobbingPattern(pattern));
+            foreach (var opti in Optimizations)
+            {
+                opti.Includes = opti.Includes.Select(pattern => CleanGlobbingPattern(pattern));
+                opti.Excludes = opti.Excludes.Select(pattern => CleanGlobbingPattern(pattern));
+            }
+
             CacheFilePath = new FileInfo(CacheFilePath).FullName;
             LogFilePath = Path.ChangeExtension(CacheFilePath, ".log");
         }
@@ -96,5 +93,12 @@ namespace ImageOptimizerWebJob
 
             return path;
         }
+    }
+
+    public class Optimization
+    {
+        public IEnumerable<string> Includes { get; set; } = Defaults.Includes;
+        public IEnumerable<string> Excludes { get; set; } = Defaults.Excludes;
+        public bool Lossy { get; set; }
     }
 }

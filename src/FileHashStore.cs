@@ -44,7 +44,7 @@ namespace ImageOptimizerWebJob
             }
         }
 
-        public void Save(string file, bool lossy)
+        public void Save(string file)
         {
             bool exist = _store.ContainsKey(file);
 
@@ -52,7 +52,7 @@ namespace ImageOptimizerWebJob
             {
                 lock (_syncRoot)
                 {
-                    _store[file] = GetHash(file, lossy);
+                    _store[file] = GetHash(file);
 
                     if (!exist)
                     {
@@ -76,12 +76,12 @@ namespace ImageOptimizerWebJob
             catch { }
         }
 
-        public bool HasChangedOrIsNew(string file, bool lossy)
+        public bool HasChangedOrIsNew(string file)
         {
             if (!_store.ContainsKey(file))
                 return true;
 
-            string currentHash = GetHash(file, lossy);
+            string currentHash = GetHash(file);
 
             if (string.IsNullOrEmpty(currentHash))
                 return true;
@@ -89,14 +89,14 @@ namespace ImageOptimizerWebJob
             return currentHash != _store[file];
         }
 
-        private string GetHash(string file, bool lossy)
+        private string GetHash(string file)
         {
             try
             {
                 if (!File.Exists(file))
                     return null;
 
-                return new FileInfo(file).Length + (lossy ? " - " + nameof(lossy) : "");
+                return new FileInfo(file).Length.ToString();
 
                 //using (var md5 = MD5.Create())
                 //using (var stream = File.OpenRead(file))

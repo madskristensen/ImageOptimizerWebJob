@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace ImageOptimizerWebJob
 {
-    public class ImageQueue : List<string>
+    public class ImageQueue : Dictionary<string, DateTime>
     {
-        private static string[] _extensions = { ".jpg", ".jpeg", ".gif", ".png" };
         private static object _logRoot = new object();
 
         private FileSystemWatcher _watcher;
@@ -34,33 +33,29 @@ namespace ImageOptimizerWebJob
 
             while (true)
             {
-                var max = Count;
+                var files = this.Where(e => e.Value < DateTime.Now.AddSeconds(-2))
+                                .Select(e => e.Key)
+                                .ToArray();
 
-                for (int i = 0; i < max; i++)
+                foreach (string file in files)
                 {
-                    await Task.Delay(250);
-                    var file = this[i];
-
-                    if (IsImageOnProbingPath(file) && _cache.HasChangedOrIsNew(file, _config.Lossy))
+                    if (IsImageOnProbingPath(file, out var opti) && _cache.HasChangedOrIsNew(file))
                     {
-                        var result = c.CompressFile(file, _config.Lossy);
+                        var result = c.CompressFile(file, opti.Lossy);
 
-                        HandleCompressionResult(result);
+                        HandleCompressionResult(result, opti);
 
-                        _cache.Save(file, _config.Lossy);
+                        _cache.Save(file);
                     }
-                }
 
-                if (max > 0)
-                {
-                    RemoveRange(0, max);
+                    Remove(file);
                 }
 
                 await Task.Delay(5000);
             }
         }
 
-        private void HandleCompressionResult(CompressionResult result)
+        private void HandleCompressionResult(CompressionResult result, Optimization opti)
         {
             if (result.Saving > 0)
             {
@@ -69,13 +64,14 @@ namespace ImageOptimizerWebJob
             }
 
             string dir = Path.GetDirectoryName(_config.FilePath);
+            string fileName = result.OriginalFileName.Replace(dir, string.Empty);
+            double percent = Math.Max(result.Percent, 0);
 
             lock (_logRoot)
             {
                 using (var writer = new StreamWriter(_config.LogFilePath, true))
                 {
-                    string fileName = result.OriginalFileName.Replace(dir, string.Empty);
-                    writer.WriteLine($"{DateTime.UtcNow.ToString("s")};{fileName};{result.Percent}%;{(_config.Lossy ? "lossy" : "lossless")}");
+                    writer.WriteLine($"{DateTime.UtcNow.ToString("s")};{fileName};{percent}%;{(opti.Lossy ? "lossy" : "lossless")}");
                 }
             }
         }
@@ -84,10 +80,14 @@ namespace ImageOptimizerWebJob
         {
             string dir = Path.GetDirectoryName(_config.FilePath);
 
-            foreach (string ext in _extensions)
+            foreach (string ext in Defaults.Extensions)
             {
                 var images = Directory.EnumerateFiles(dir, "*" + ext, SearchOption.AllDirectories);
-                AddRange(images);
+
+                foreach (var image in images)
+                {
+                    this[image] = DateTime.Now;
+                }
             }
         }
 
@@ -100,22 +100,31 @@ namespace ImageOptimizerWebJob
             _watcher.EnableRaisingEvents = true;
         }
 
-        private bool IsImageOnProbingPath(string file)
+        private bool IsImageOnProbingPath(string file, out Optimization optimization)
         {
-            bool isIncluded = _config.Includes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
+            optimization = null;
 
-            if (!isIncluded)
-                return false;
+            foreach (var opti in _config.Optimizations)
+            {
+                optimization = opti;
 
-            bool isExcluded = _config.Excludes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
+                bool isIncluded = opti.Includes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
 
-            if (isExcluded)
-                return false;
+                if (!isIncluded)
+                    continue;
 
-            return true;
+                bool isExcluded = opti.Excludes.Any(pattern => Minimatcher.Check(file, pattern, _matcherOptions));
+
+                if (isExcluded)
+                    continue;
+
+                return true;
+            }
+
+            return false;
         }
 
-        private void FileChanged(object sender, FileSystemEventArgs e)
+        private async void FileChanged(object sender, FileSystemEventArgs e)
         {
             string file = e.FullPath;
             string ext = Path.GetExtension(file);
@@ -123,12 +132,13 @@ namespace ImageOptimizerWebJob
             if (string.IsNullOrWhiteSpace(ext) || ext.Contains('~'))
                 return;
 
-            if (_extensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && !Contains(file) && _cache.HasChangedOrIsNew(file, _config.Lossy))
+            if (Defaults.Extensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && !ContainsKey(file) && _cache.HasChangedOrIsNew(file))
             {
-                Add(file);
+                this[file] = DateTime.Now;
             }
             else if (e.FullPath == _config.FilePath)
             {
+                await Task.Delay(2000).ConfigureAwait(false);
                 _config.Update();
                 QueueExistingFiles();
             }

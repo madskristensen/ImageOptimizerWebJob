@@ -8,8 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD98C7ED-B573-4C01-8484-86061F26E1A0}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		Azure.ImageOptimizer.WebJob.nuspec = Azure.ImageOptimizer.WebJob.nuspec
-		Azure.ImageOptimizer.WebJob.targets = Azure.ImageOptimizer.WebJob.targets
+		Azure.ImageOptimizer.nuspec = Azure.ImageOptimizer.nuspec
+		Azure.ImageOptimizer.targets = Azure.ImageOptimizer.targets
 		README.md = README.md
 	EndProjectSection
 EndProject

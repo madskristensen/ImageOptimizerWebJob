@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
-        <id>Azure.ImageOptimizer.WebJob</id>
-        <version>1.0.0.32</version>
+        <id>Azure.ImageOptimizer</id>
+        <version>1.0.0.37</version>
         <title>Azure Image Optimizer</title>
         <authors>Mads Kristensen</authors>
         <owners>Mads Kristensen</owners>
@@ -15,9 +15,7 @@
         <tags>Image Optimizer, compression, optimization, png, jpg, gif</tags>
         <developmentDependency>true</developmentDependency>
     </metadata>
-    <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
     <files>
-        <!--<file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />-->
         <file src="src\bin\debug\*.exe" target="opti" />
         <file src="src\bin\debug\*.dll" target="opti" />
         <file src="src\bin\debug\*.config" target="opti" />

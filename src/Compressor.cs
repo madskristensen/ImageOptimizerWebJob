@@ -2,13 +2,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace ImageOptimizerWebJob
 {
     public class Compressor
     {
-        static readonly string[] _supported = { ".png", ".jpg", ".jpeg", ".gif" };
         string _cwd;
 
         public Compressor()
@@ -62,30 +60,26 @@ namespace ImageOptimizerWebJob
             {
                 case ".png":
                     if (lossy)
+                    {
                         return string.Format(CultureInfo.CurrentCulture, "/c png-lossy.cmd \"{0}\" \"{1}\"", sourceFile, targetFile);
+                    }
 
                     return string.Format(CultureInfo.CurrentCulture, "/c png-lossless.cmd \"{0}\" \"{1}\"", sourceFile, targetFile);
 
                 case ".jpg":
                 case ".jpeg":
                     if (lossy)
+                    {
                         return string.Format(CultureInfo.CurrentCulture, "/c cjpeg -quality 80,60 -dct float -smooth 5 -outfile \"{1}\" \"{0}\"", sourceFile, targetFile);
+                    }
 
                     return string.Format(CultureInfo.CurrentCulture, "/c jpegtran -copy none -optimize -progressive -outfile \"{1}\" \"{0}\"", sourceFile, targetFile);
-                //return string.Format(CultureInfo.CurrentCulture, "/c guetzli_windows_x86-64 \"{0}\" \"{1}\"", sourceFile, targetFile);
 
                 case ".gif":
                     return string.Format(CultureInfo.CurrentCulture, "/c gifsicle -O3 --batch --colors=256 \"{0}\" --output=\"{1}\"", sourceFile, targetFile);
             }
 
             return null;
-        }
-
-        public static bool IsFileSupported(string fileName)
-        {
-            string ext = Path.GetExtension(fileName);
-
-            return _supported.Any(s => s.Equals(ext, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
