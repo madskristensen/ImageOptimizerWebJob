@@ -11,13 +11,11 @@ namespace ImageOptimizerWebJob
         public Config()
         {
             Optimizations = new List<Optimization> { new Optimization() };
-            WarmupTime = Defaults.WarmupTime;
             CacheFilePath = Defaults.CacheFilePath;
             FilePath = Path.Combine(Defaults.FolderToWatch, Defaults.ConfigFileName);
         }
 
         public List<Optimization> Optimizations { get; set; }
-        public int WarmupTime { get; set; }
 
         [ScriptIgnore]
         public string CacheFilePath { get; set; }
@@ -54,7 +52,6 @@ namespace ImageOptimizerWebJob
                     var ser = new JavaScriptSerializer();
                     var options = ser.Deserialize<Config>(reader.ReadToEnd());
                     Optimizations = options.Optimizations;
-                    WarmupTime = options.WarmupTime;
                 }
             }
             else
@@ -63,7 +60,6 @@ namespace ImageOptimizerWebJob
 
                 var options = new Config();
                 Optimizations = options.Optimizations;
-                WarmupTime = options.WarmupTime;
             }
 
             NormalizePaths();

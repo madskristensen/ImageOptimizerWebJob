@@ -8,7 +8,6 @@ namespace ImageOptimizerWebJob
         public static readonly string ConfigFileName = ConfigurationManager.AppSettings.Get("configFileName");
         public static readonly string CacheFilePath = ConfigurationManager.AppSettings.Get("logfile");
         public static readonly string FolderToWatch = ConfigurationManager.AppSettings.Get("folderToWatch");
-        public static readonly int WarmupTime = 60;
         public static readonly string[] Extensions  = { ".jpg", ".jpeg", ".gif", ".png" };
 
         public static readonly List<string> Includes = new List<string> { FolderToWatch    };

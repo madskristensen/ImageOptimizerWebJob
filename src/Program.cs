@@ -22,11 +22,6 @@ namespace ImageOptimizerWebJob
 
             Task.Run(async () =>
             {
-                int wait = options.WarmupTime * 1000;
-
-                Console.WriteLine($"Image Optimizer starting. Waiting for {options.WarmupTime} seconds...");
-                await Task.Delay(wait);
-
                 Console.WriteLine("Image Optimizer started");
                 Console.WriteLine($"Watching {new DirectoryInfo(basePath).FullName}");
 
