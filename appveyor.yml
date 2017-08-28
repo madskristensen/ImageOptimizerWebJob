@@ -3,7 +3,7 @@ version: 1.0.{build}
 
 build_script:
   - nuget restore -verbosity quiet
-  - msbuild
+  - msbuild /p:configuration=Release /verbosity:minimal
 
 artifacts:
   - path: 'build\*.nupkg'
