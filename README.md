@@ -134,7 +134,7 @@ You can also **exclude** certain files (or globbing patterns) like this:
   "optimizations": [
     {
       "includes": [ "img/**/*.*" ],
-      "excludes": [ "**/*.jpg" ]
+      "excludes": [ "**/*.jpg" ],
       "lossy": true
     }
   ]
