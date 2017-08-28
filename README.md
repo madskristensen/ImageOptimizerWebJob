@@ -78,7 +78,7 @@ https:// mywebsite.**scm**.azurewebsites.net/DebugConsole
 
 ![Scm Debugconsole](art/scm-debugconsole.png)
 
-Notice the two files called *ImageOptimizer.Cache* and *ImageOptimizer.log*.
+Notice the two files called **ImageOptimizer.Cache** and **ImageOptimizer.log**.
 
 The **.cache** file is used by the optimizer engine to keep track on what files have been previously compressed, so that it doesn't run on files twice unless it has changed.
 
