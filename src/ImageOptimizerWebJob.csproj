@@ -99,6 +99,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(SolutionDir)build"
-build.cmd</PostBuildEvent>
+build.cmd $(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
 </Project>
