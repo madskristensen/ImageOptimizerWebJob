@@ -1,0 +1,1 @@
+nuget pack "Azure.ImageOptimizer.nuspec" -verbosity quiet

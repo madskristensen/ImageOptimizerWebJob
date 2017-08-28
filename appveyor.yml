@@ -7,7 +7,7 @@ build_script:
   - nuget pack
 
 artifacts:
-  - path: 'Azure.ImageOptimizer*.nupkg'
+  - path: 'build\*.nupkg'
     name: NuGet package
 
 deploy:

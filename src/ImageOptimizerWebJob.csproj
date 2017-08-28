@@ -98,7 +98,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>cd "$(SolutionDir)build"
+build.cmd</PostBuildEvent>
   </PropertyGroup>
 </Project>

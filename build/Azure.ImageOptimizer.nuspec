@@ -16,10 +16,10 @@
         <developmentDependency>true</developmentDependency>
     </metadata>
     <files>
-        <file src="src\bin\debug\*.exe" target="opti" />
-        <file src="src\bin\debug\*.dll" target="opti" />
-        <file src="src\bin\debug\*.config" target="opti" />
-        <file src="src\tools\*" target="opti\tools" />
+        <file src="..\src\bin\debug\*.exe" target="opti" />
+        <file src="..\src\bin\debug\*.dll" target="opti" />
+        <file src="..\src\bin\debug\*.config" target="opti" />
+        <file src="..\src\tools\*" target="opti\tools" />
         <file src="*.targets" target="build" />
     </files>
 </package>
