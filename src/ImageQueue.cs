@@ -59,7 +59,9 @@ namespace ImageOptimizerWebJob
         {
             if (result.Saving > 0)
             {
+                DateTime creationTime = File.GetCreationTime(result.OriginalFileName);
                 File.Copy(result.ResultFileName, result.OriginalFileName, true);
+                File.SetCreationTime(result.OriginalFileName, creationTime);
                 File.Delete(result.ResultFileName);
             }
 
