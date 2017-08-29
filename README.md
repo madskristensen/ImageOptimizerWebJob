@@ -28,7 +28,8 @@ Industry standard algorithms are being used to provide optimal compression.
 ## Supported platforms
 
 - Azure App Services (formerly known as Azure Websites)
-- ASP.NET
+- ASP.NET WebForms
+- ASP.NET MVC
 - ASP.NET Core
 
 The Azure.ImageOptimizer will only run on Azure. Installing the NuGet package locally won't do anything until published to Azure.
