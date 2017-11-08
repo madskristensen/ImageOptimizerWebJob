@@ -172,13 +172,13 @@ Lossless compression usually yields between **5% and 20%** recuction of file siz
 
 The benefit of using lossy compression is that it reduces the file size significantly more than lossless compression.
 
-Lossy compression yields file reductions of up to **70%** of the original size.
+Lossy compression yields file reductions of up to **75%** of the original size.
 
 ## Best practices
 Here are some best practices for image optimization
 
 ### Compress in advance
-All images that are part of your project can be optimized in advance before deploying to Azure. Use any good compression tool such as the [Image Optimizer extension](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.ImageOptimizer) for Visual Studio (they both run the exact same algorithms).
+All images that are part of your project can be optimized in advance before deploying to Azure. Use any good compression tool such as the [Image Optimizer extension](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.ImageOptimizer) for Visual Studio (it uses the exact same algorithms as this NuGet package).
 
 ### Compress only user uploaded images
 When everything is compressed in advance (see above trick), you only need to run the ImageOptimizer on the folders that contain images that didn't exist in advance - also knows as user generated/uploaded images. 
