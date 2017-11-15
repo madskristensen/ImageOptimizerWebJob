@@ -59,12 +59,12 @@ namespace ImageOptimizerWebJob
             switch (ext)
             {
                 case ".png":
-                    if (lossy)
-                    {
-                        return string.Format(CultureInfo.CurrentCulture, "/c png-lossy.cmd \"{0}\" \"{1}\"", sourceFile, targetFile);
-                    }
+                    File.Copy(sourceFile, targetFile);
 
-                    return string.Format(CultureInfo.CurrentCulture, "/c png-lossless.cmd \"{0}\" \"{1}\"", sourceFile, targetFile);
+                    if (lossy)
+                        return string.Format(CultureInfo.CurrentCulture, "/c pingo -s8 -q -palette=79 \"{0}\"", targetFile);
+                    else
+                        return string.Format(CultureInfo.CurrentCulture, "/c pingo -s8 -q \"{0}\"", targetFile);
 
                 case ".jpg":
                 case ".jpeg":

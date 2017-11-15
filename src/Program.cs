@@ -11,6 +11,9 @@ namespace ImageOptimizerWebJob
             string basePath = Defaults.FolderToWatch;
             string logFilePath = Defaults.CacheFilePath;
 
+            if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+                throw new Exception("The folder MUST end with a backslash");
+
             if (!Directory.Exists(basePath))
                 basePath = "./";
 
